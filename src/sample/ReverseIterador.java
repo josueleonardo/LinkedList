@@ -1,19 +1,31 @@
 package sample;
 
-public class ReverseIterador{
+import sample.Node;
+import sample.LinkedList;
 
-    public ReverseIterador(Node tall) {
-        if(next() == 0){
-            System.out.println("0");
-        } else if(hasNext()){
-            System.out.println("No");
-        }
+public class ReverseIterador<G> {
+
+    //private Node<G> currentNode;
+    public Node<G> currentNode;
+
+    private Node<G> head;
+    private Node<G> tail;
+    private int size;
+
+    public ReverseIterador() {
+        this.currentNode = tail;
     }
+
 
     public boolean hasNext(){
-        return false;
+        return currentNode != null;
     }
-    public int next(){
-        return 0;
+
+    public G next(){
+        G data = currentNode.data;
+
+        currentNode = currentNode.previous;
+
+        return data;
     }
 }

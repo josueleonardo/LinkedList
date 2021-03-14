@@ -1,111 +1,140 @@
 package sample;
 
-import sample.Node;
+//import sample.Node;
+import sample.Iterador;
+import sample.ReverseIterador;
 
-public class LinkedList {
+public class LinkedList<G> {
 
-    public static final int BEFORE = 0;
-    public static final int AFTER = 1;
-
-    private Node head;
-    private Node tall;
+    private Node<G> head;
+    private Node<G> tail;
     private int size;
 
-    public void add(int valor){
-        Node node = new Node(valor);
+    public LinkedList() {
+        listsCount ++;
+    }
 
-        node.setAnterior(tall);
+    private static int listsCount = 0;
 
-        if(tall != null){
-            tall.setSiguiente(node);
+    public static int getListsCount(){
+        return listsCount;
+    }
+
+    public void add(G data) {
+        Node<G> node = new Node<>(data);
+
+        node.previous = tail;
+
+        if (tail != null) {
+            tail.next = node;
         }
-        if(head == null){
+
+        if (head == null) {
             head = node;
         }
-        tall = node;
+
+        tail = node;
         size++;
     }
 
-    public int get(int index){
-        Node currentNode = head;
+    public G get(int index) {
+        Node<G> currentNode = head;
         int currentIndex = 0;
 
-        while (currentIndex < index){
-            currentNode = currentNode.getSiguiente();
+        while (currentIndex < index) {
+            currentNode = currentNode.next;
             currentIndex++;
         }
 
-        return currentNode.getValor();
+        return currentNode.data;
     }
 
-    public void delete(int index){
-        Node currentNode = head;
+    public void delete(int index) {
+        Node<G> currentNode = head;
         int currentIndex = 0;
 
-        if(index <0 || index>= size){
+        if (index < 0 || index >= size) {
             return;
         }
 
         size--;
 
-        if(size == 0){
+        if (size == 0) {
             head = null;
-            tall = null;
+            tail = null;
             return;
         }
 
-        if(index == 0){
-            head = head.getSiguiente();
-            head.setAnterior(null);
+        if (index == 0) {
+            head = head.next;
+            head.previous = null;
         }
 
-        if(index == size){
-            while (currentIndex < index){
-                currentNode = currentNode.getSiguiente();
+        if (index == size) {
+            tail = tail.previous;
+            tail.next = null;
+        }
+
+        if (index > 0 && index < size) {
+            while (currentIndex < index) {
+                currentNode = currentNode.next;
                 currentIndex++;
             }
-            currentNode.getAnterior().setSiguiente(currentNode.getSiguiente());
-            currentNode.getSiguiente().setAnterior(currentNode.getAnterior());
+            currentNode.previous.next = currentNode.next;
+            currentNode.next.previous = currentNode.previous;
         }
+
+
     }
 
-    public Iterador getIterator(){
-        return new Iterador(head);
+    public Iterador getIterator() {
+        return new Iterador();
     }
 
-    public void insert(int data, int position, Iterador it){
-        Node newNode = new Node(data);
-        Node currentNode = it.getCurrentNode();
+    public void insert(G data, Position position, Iterador it) {
+        // ¿qué ofrece java para restringir los valores de position a solamente BEFORE y AFTER?
 
-        if(position == AFTER) {
-            newNode.setSiguiente(currentNode.getSiguiente());
-            newNode.setAnterior(currentNode);
-            currentNode.setSiguiente(newNode);
-            if (newNode.getSiguiente() != null) {
-                newNode.getSiguiente().setAnterior(newNode);
+        Node<G> newNode = new Node<>(data);
+        Node<G> currentNode = it.getCurrentNode();
+
+        if (position == Position.AFTER) {
+            newNode.next = currentNode.next;
+            newNode.previous = currentNode;
+            currentNode.next = newNode;
+            if (newNode.next != null) {
+                newNode.next.previous = newNode;
             } else {
-                tall = newNode;
+                tail = newNode;
             }
-        }else if(position == BEFORE){
-            newNode.setAnterior(currentNode.getAnterior());
-            newNode.setSiguiente(currentNode);
-            currentNode.setAnterior(newNode);
-            if(newNode.getAnterior() != null){
-                newNode.getAnterior().setSiguiente(newNode);
-            }else{
+        } else if (position == Position.BEFORE) {
+            newNode.previous = currentNode.previous;
+            newNode.next = currentNode;
+            currentNode.previous = newNode;
+            if (newNode.previous != null) {
+                newNode.previous.next = newNode;
+            } else {
                 head = newNode;
             }
-        }else{
-            System.out.println("No conoszo el valor de posicion");
+        } else {
+            System.out.println("No conozco el valor de position");
         }
         size++;
     }
 
-    public int getSize(){
+    public int getSize() {
         return size;
     }
 
-    public ReverseIterador getReversIterador(){
-        return new ReverseIterador(tall);
+    public ReverseIterador getReverseIterator() {
+        return new ReverseIterador();
+    }
+
+    public class Iterador extends sample.Iterador {
+        public Iterador(sample.Iterador it) {
+        }
+
+        public Iterador() {
+
+        }
     }
 }
