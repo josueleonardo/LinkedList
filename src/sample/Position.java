@@ -1,5 +1,5 @@
 package sample;
 
 public enum Position {
-    BEFORE, AFTER
+    BEFORE, AFTER;
 }

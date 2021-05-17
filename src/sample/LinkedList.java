@@ -1,35 +1,84 @@
 package sample;
 
-//import sample.Node;
-import sample.Iterador;
-import sample.ReverseIterador;
+public class LinkedList<G> implements List<G> {
 
-public class LinkedList<G> {
+    private static class Node<T>{
+        private final T data;
+        private Node<T> previous;
+        private Node<T> next;
+
+        Node(T data){
+            this.data = data;
+        }
+    }
+
+    public class ForwardIterator implements Iterator<G> {
+        private Node<G> currentNode;
+
+        public ForwardIterator(){
+            this.currentNode = head;
+        }
+
+        @Override
+        public boolean hasNext(){
+            return currentNode != null;
+        }
+
+        @Override
+        public G next(){
+            G data = currentNode.data;
+            currentNode = currentNode.next;
+            return data;
+        }
+    }
+
+    public class ReverseIterator implements Iterator<G>{
+        private Node<G> currentNode;
+
+        public ReverseIterator(){
+            this.currentNode = tail;
+        }
+
+        @Override
+        public boolean hasNext(){
+            return currentNode != null;
+        }
+
+        @Override
+        public G next(){
+            G data = currentNode.data;
+            currentNode = currentNode.previous;
+            return data;
+        }
+    }
 
     private Node<G> head;
     private Node<G> tail;
     private int size;
-
-    public LinkedList() {
-        listsCount ++;
-    }
-
     private static int listsCount = 0;
+
+    public LinkedList(){
+        listsCount++;
+    }
 
     public static int getListsCount(){
         return listsCount;
     }
 
-    public void add(G data) {
+    /***
+     * Inserts data at the end of the list
+     * @param data Data to be inserted
+     */
+    @Override
+    public void add(G data){
         Node<G> node = new Node<>(data);
-
         node.previous = tail;
 
-        if (tail != null) {
+        if(tail != null){
             tail.next = node;
         }
 
-        if (head == null) {
+        if(head == null){
             head = node;
         }
 
@@ -37,104 +86,74 @@ public class LinkedList<G> {
         size++;
     }
 
-    public G get(int index) {
+    /**
+     * @param index 0-index
+     * @return data in index
+     */
+    @Override
+    public G get(int index){
         Node<G> currentNode = head;
-        int currentIndex = 0;
+        int currentindex = 0;
 
-        while (currentIndex < index) {
+        while(currentindex < index){
             currentNode = currentNode.next;
-            currentIndex++;
+            currentindex++;
         }
 
         return currentNode.data;
     }
 
-    public void delete(int index) {
+    /**
+     * @param index 0-index
+     */
+    @Override
+    public void delete(int index) throws IndexOutOfBoundsException{
         Node<G> currentNode = head;
         int currentIndex = 0;
 
-        if (index < 0 || index >= size) {
-            return;
+        if(index < 0 || index >= size){
+            throw new IndexOutOfBoundsException();
         }
-
         size--;
 
-        if (size == 0) {
+        if(size == 0){
             head = null;
             tail = null;
             return;
         }
 
-        if (index == 0) {
+        if(index == 0){
             head = head.next;
             head.previous = null;
         }
 
-        if (index == size) {
+        if(index == size){
             tail = tail.previous;
             tail.next = null;
         }
 
-        if (index > 0 && index < size) {
-            while (currentIndex < index) {
+        if(index > 0 && index < size){
+            while(currentIndex < index){
                 currentNode = currentNode.next;
                 currentIndex++;
             }
             currentNode.previous.next = currentNode.next;
             currentNode.next.previous = currentNode.previous;
         }
-
-
     }
 
-    public Iterador getIterator() {
-        return new Iterador();
+    @Override
+    public ForwardIterator getIterator(){
+        return new ForwardIterator();
     }
 
-    public void insert(G data, Position position, Iterador it) {
-        // ¿qué ofrece java para restringir los valores de position a solamente BEFORE y AFTER?
-
-        Node<G> newNode = new Node<>(data);
-        Node<G> currentNode = it.getCurrentNode();
-
-        if (position == Position.AFTER) {
-            newNode.next = currentNode.next;
-            newNode.previous = currentNode;
-            currentNode.next = newNode;
-            if (newNode.next != null) {
-                newNode.next.previous = newNode;
-            } else {
-                tail = newNode;
-            }
-        } else if (position == Position.BEFORE) {
-            newNode.previous = currentNode.previous;
-            newNode.next = currentNode;
-            currentNode.previous = newNode;
-            if (newNode.previous != null) {
-                newNode.previous.next = newNode;
-            } else {
-                head = newNode;
-            }
-        } else {
-            System.out.println("No conozco el valor de position");
-        }
-        size++;
+    @Override
+    public ReverseIterator getReverseIterator(){
+        return new ReverseIterator();
     }
 
+    @Override
     public int getSize() {
         return size;
-    }
-
-    public ReverseIterador getReverseIterator() {
-        return new ReverseIterador();
-    }
-
-    public class Iterador extends sample.Iterador {
-        public Iterador(sample.Iterador it) {
-        }
-
-        public Iterador() {
-
-        }
     }
 }
